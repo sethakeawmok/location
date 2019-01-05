@@ -31,8 +31,8 @@
 
       function initMap() {
 			var mapOptions = {
-			  center: {lat: 13.847860, lng: 100.604274},
-			  zoom: 14,
+			  center: {lat: 13.0957776, lng: 100.977819},
+			  zoom: 10,
 			}
 				
 			var maps = new google.maps.Map(document.getElementById("map"),mapOptions);
@@ -41,22 +41,26 @@
 
 			$.getJSON( "json.php", function( jsonObj ) {
 					//*** loop
+          
 					$.each(jsonObj, function(i, item){
+            var n = item.meta_value.indexOf(",");
+            var LAT = item.meta_value.substr(0, n);
+            var LNG = item.meta_value.substr(n+1);
+
 						marker = new google.maps.Marker({
-						   position: new google.maps.LatLng(item.LAT, item.LNG),
+						   position: new google.maps.LatLng(LAT,LNG),
 						   map: maps,
-						   title: item.LOC_NAME
+						   title: item.post_title
 						});
 
 					  info = new google.maps.InfoWindow();
 
 					  google.maps.event.addListener(marker, 'click', (function(marker, i) {
 						return function() {
-						  info.setContent(item.LOC_NAME);
+						  info.setContent(item.post_title);
 						  info.open(maps, marker);
 						}
 					  })(marker, i));
-
 					}); // loop
 
 			 });
