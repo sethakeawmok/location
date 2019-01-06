@@ -4,14 +4,23 @@
 	$objConnect = mysqli_connect("localhost","root","","klungadmin_wp");
 	mysqli_query($objConnect, "set names utf8");
 	
-	// $strSQL = "SELECT * FROM location  ";
+	$state = 'chonburi';
+	$city = 'si-racha';
 
-	$strSQL = "SELECT t1.ID,t1.post_title,t3.taxonomy,t4.slug,t12.meta_key,t12.meta_value FROM `main_posts` t1 
-	INNER JOIN main_term_relationships t2 on t1.ID = t2.object_id
-	INNER JOIN main_term_taxonomy t3 ON t2.term_taxonomy_id = t3.term_taxonomy_id
-	INNER JOIN main_terms t4 ON t3.term_id = t4.term_id
-	INNER JOIN main_postmeta t12 ON t1.ID = t12.post_id
-	WHERE  t1.post_type = 'property' and t1.post_status = 'publish' AND t3.taxonomy = 'property_state' AND t4.slug = 'chonburi' AND t12.meta_key = 'fave_property_location'";
+	$strSQL = "SELECT * FROM ( 
+					SELECT t1.ID,t1.post_title,t1.post_status,t2.meta_key,t2.meta_value
+						,(SELECT main_terms.slug FROM main_term_relationships
+							INNER JOIN main_term_taxonomy on main_term_relationships.term_taxonomy_id = main_term_taxonomy.term_taxonomy_id
+							INNER JOIN main_terms on main_term_taxonomy.term_id = main_terms.term_id
+							WHERE  main_term_taxonomy.taxonomy = 'property_state' and main_term_relationships.object_id = t1.ID) as state
+						,(SELECT main_terms.slug FROM main_term_relationships
+							INNER JOIN main_term_taxonomy on main_term_relationships.term_taxonomy_id = main_term_taxonomy.term_taxonomy_id 
+							INNER JOIN main_terms on main_term_taxonomy.term_id = main_terms.term_id 
+							WHERE main_term_taxonomy.taxonomy = 'property_city' and main_term_relationships.object_id = t1.ID ) as city		
+					FROM main_posts t1
+					INNER JOIN main_postmeta t2 ON t1.ID = t2.post_id
+					WHERE t1.post_type = 'property' and t1.post_status = 'publish'  AND t2.meta_key = 'fave_property_location' 
+		   		) o1 WHERE state = '$state' AND city = '$city'";
 
 
 	$objQuery = mysqli_query($objConnect,$strSQL);
@@ -24,4 +33,5 @@
 	mysqli_close($objConnect);
 	
 	echo json_encode($resultArray);
+
 ?>

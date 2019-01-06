@@ -41,7 +41,7 @@
 
 			$.getJSON( "json.php", function( jsonObj ) {
 					//*** loop
-          
+          var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
 					$.each(jsonObj, function(i, item){
             var n = item.meta_value.indexOf(",");
             var LAT = item.meta_value.substr(0, n);
@@ -50,6 +50,34 @@
 						marker = new google.maps.Marker({
 						   position: new google.maps.LatLng(LAT,LNG),
 						   map: maps,
+               icon: image,
+						   title: item.post_title
+						});
+
+					  info = new google.maps.InfoWindow();
+
+					  google.maps.event.addListener(marker, 'click', (function(marker, i) {
+						return function() {
+						  info.setContent(item.post_title);
+						  info.open(maps, marker);
+						}
+					  })(marker, i));
+					}); // loop
+
+			 });
+
+       $.getJSON( "json.php", function( jsonObj ) {
+					//*** loop
+          var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+					$.each(jsonObj, function(i, item){
+            var n = item.meta_value.indexOf(",");
+            var LAT = item.meta_value.substr(0, n);
+            var LNG = item.meta_value.substr(n+1);
+
+						marker = new google.maps.Marker({
+						   position: new google.maps.LatLng(LAT,LNG),
+						   map: maps,
+               //icon: image,
 						   title: item.post_title
 						});
 
